@@ -45,6 +45,7 @@
     "supertest": ""
   },
   "scripts": {
+    "circleci": "npm run hint && make circleci",
     "test": "npm run hint && make test",
     "start": "npm run hint && node .",
     "hint": "jscs app/**/*.js test/*.js --config=.jscsrc"
