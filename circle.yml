@@ -1,7 +1,8 @@
 machine:
   post:
-   - npm install jscs@1.13.1 -g
-   - npm install mocha -g
+    - npm install npm@2.5.1 -g
+    - npm install jscs@1.13.1 -g
+    - npm install mocha -g
   node:
     version: 0.10.36
   services:
