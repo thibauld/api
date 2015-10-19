@@ -1,6 +1,6 @@
 machine:
   post:
-   - npm install jscs -g
+   - npm install jscs@1.13.1 -g
   node:
     version: 0.10.36
   services:
