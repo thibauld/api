@@ -2,10 +2,10 @@ machine:
   post:
    - npm install jscs@1.13.1 -g
    - npm install mocha -g
-  test:
-    override:
-      - npm run circleci
   node:
     version: 0.10.36
   services:
     - postgresql
+test:
+  override:
+    - npm run circleci
