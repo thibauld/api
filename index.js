@@ -37,6 +37,11 @@ app.set('controllers', require('./app/controllers')(app));
  */
 require('./app/controllers/routes')(app);
 
+/**
+ * Notifications.
+ */
+require('./app/lib/activity_events_slack')(app);
+
 if (_.contains(['test', 'circleci'], app.set('env'))) {
   return module.exports = app;
 } else {

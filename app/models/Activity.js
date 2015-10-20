@@ -1,3 +1,5 @@
+var eventEmitter = require('../lib/activity_events');
+
 module.exports = function(Sequelize, DataTypes) {
 
   var Activity = Sequelize.define('Activity', {
@@ -10,6 +12,13 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: Sequelize.NOW
     }
   }, {
+    hooks: {
+      // if an activity is successfully stored, notify anyone else who cares
+      afterCreate: function(activity, options) {
+        console.log('emitting: ', activity.type, activity.data);
+        eventEmitter.emit(activity.type, activity.data);
+      }
+    },
     updatedAt: false
   });
 
