@@ -376,6 +376,7 @@ module.exports = function(app) {
         }
       };
 
+      console.log('payload', JSON.stringify(payload));
       app.paypalAdaptive.pay(payload, callback);
     }
 
@@ -447,6 +448,8 @@ module.exports = function(app) {
           return cb(new errors.NotImplemented('This service is not implemented yet for payment.'));
         }
 
+        console.log('callService', JSON.stringify(results));
+
         /**
          * Expenses are stored with negative values in the backend but paypal
          * wants positive values in the API, we will change the sign of the amount
@@ -483,6 +486,7 @@ module.exports = function(app) {
       }]
 
     }, function(err, results) {
+      console.log('end', JSON.stringify(results.callService));
       if (err) return next(err);
       else res.json(results.updateTransaction);
     });
