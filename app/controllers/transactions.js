@@ -192,12 +192,12 @@ module.exports = function(app) {
               {
                 email: results.getUser.paypalEmail || results.getUser.email,
                 amount: amount,
-                paymentType: 'PERSONAL'
+                paymentType: 'SERVICE'
               },
               {
                 email: config.paypal.classic.email,
                 amount: calculateOCfee(amount, config.paypal.feeOC),
-                paymentType: 'PERSONAL'
+                paymentType: 'SERVICE'
               }
             ]
           }
@@ -365,12 +365,12 @@ module.exports = function(app) {
             {
               email: data.beneficiary.email,
               amount: amount,
-              paymentType: 'PERSONAL'
+              paymentType: 'SERVICE'
             },
             {
               email: config.paypal.classic.email,
               amount: calculateOCfee(amount, config.paypal.feeOC),
-              paymentType: 'PERSONAL'
+              paymentType: 'SERVICE'
             }
           ]
         }
