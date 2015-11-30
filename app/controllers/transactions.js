@@ -195,7 +195,7 @@ module.exports = function(app) {
                 paymentType: 'SERVICE'
               },
               {
-                email: config.paypal.classic.email,
+                email: 'xdamman+opencollective@gmail.com',
                 amount: calculateOCfee(amount, config.paypal.feeOC),
                 paymentType: 'SERVICE'
               }
