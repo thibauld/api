@@ -483,6 +483,7 @@ module.exports = function(app) {
       }]
 
     }, function(err, results) {
+      console.log('callService', JSON.stringify(results.callService))
       if (err) return next(err);
       else res.json(results.updateTransaction);
     });
