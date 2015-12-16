@@ -26,8 +26,6 @@ describe('paypal.preapproval.routes.test.js', function() {
   var user;
   var user2;
 
-  var stub;
-
   beforeEach(function() {
     var stub = sinon.stub(app.paypalAdaptive, 'preapproval');
     stub.yields(null, paypalMock.adaptive.preapproval);
@@ -271,7 +269,7 @@ describe('paypal.preapproval.routes.test.js', function() {
 
     });
 
-    describe('Details from Paypal ERROR', function(done) {
+    describe('Details from Paypal ERROR', function() {
 
       beforeEach(function() {
         var mock = paypalMock.adaptive.preapprovalDetails.error;
