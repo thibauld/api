@@ -19,7 +19,12 @@ exec('make dropdb && make database')
 })
 .then(function(result) {
   console.log('output', result.stdout);
-  return seed();
+  return seed().catch(function(err) {
+    console.error('Script error');
+    console.log('error', err);
+    console.log('stack', err.stack);
+    process.exit();
+  });;
 })
 .then(function() {
   console.log('Please login on development with `admin@opencollective.com` and `password`');
