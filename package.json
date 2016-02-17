@@ -61,7 +61,7 @@
     "supertest": ""
   },
   "scripts": {
-    "test": "NODE_ENV=test npm run hint && NODE_ENV=test mocha test",
+    "test": "NODE_ENV=test npm run hint && NODE_ENV=test npm run test:reset && NODE_ENV=test mocha test",
     "circleci": "NODE_ENV=circleci npm run hint && mocha test",
     "start": "npm run hint && node .",
     "hint": "eslint '**/*.js' --quiet",
@@ -71,6 +71,7 @@
     "db:copyprod": "./scripts/db_copy_prod_to_localhost.sh",
     "db:copyprodtostaging": "./scripts/db_copy_prod_to_staging.sh",
     "db:reset": "NODE_ENV=development node scripts/reset",
+    "test:reset": "NODE_ENV=test node scripts/reset_test_db",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
     "postinstall": "sh ./scripts/postinstall.sh",
     "git:clean": "git branch --merged | grep -v \\* | grep -v master | grep -v dev | xargs -n 1 git branch -d",

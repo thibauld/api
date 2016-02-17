@@ -19,7 +19,7 @@ var models = app.set('models');
 /**
  * Tests.
  */
-describe('activities.routes.test.js', function() {
+describe.only('activities.routes.test.js', function() {
 
   var application;
   var user;
@@ -36,6 +36,7 @@ describe('activities.routes.test.js', function() {
   // Create users.
   beforeEach(function(done) {
     models.User.create(utils.data('user1')).done(function(e, u) {
+      console.log('e', e);
       expect(e).to.not.exist;
       user = u;
       done();
@@ -69,21 +70,30 @@ describe('activities.routes.test.js', function() {
   beforeEach(function(done) {
     group
       .addUser(user, {role: roles.HOST})
-      .done(done);
+      .done((err) => {
+        console.log('err', err);
+        done(err);
+      });
   });
 
   // Add an backer to the group.
   beforeEach(function(done) {
     group
       .addUser(user3, {role: roles.BACKER})
-      .done(done);
+      .done((err) => {
+        console.log('err', err);
+        done(err);
+      });
   });
 
   // Create activities.
   beforeEach(function(done) {
     async.eachSeries(activitiesData, function(a, cb) {
       models.Activity.create(a).done(cb);
-    }, done);
+    }, (err) => {
+      console.log('err', err);
+      done(err);
+    });
   });
 
   /**

@@ -6,6 +6,13 @@
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
+  "test": {
+    "database": "opencollective_test",
+    "username": "opencollective",
+    "password": "",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
   "staging": {
     "use_env_variable": "PG_URL"
   },
