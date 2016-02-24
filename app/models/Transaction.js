@@ -49,6 +49,11 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: false
     },
 
+    subscriptionIsActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -121,7 +126,8 @@ module.exports = function(Sequelize, DataTypes) {
           isDonation: this.isDonation,
           isManual: this.isManual,
           isReimbursed: this.isReimbursed,
-          interval: this.interval
+          interval: this.interval,
+          subscriptionIsActive: this.subscriptionIsActive
         };
       }
     }
