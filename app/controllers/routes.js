@@ -45,11 +45,6 @@ module.exports = function(app) {
   app.use(
     mw.apiKey,
     jwt,
-    // expressJwt({
-    //   secret: config.keys.opencollective.secret,
-    //   requestProperty: 'jwtPayload',
-    //   credentialsRequired: true
-    // }),
     mw.identifyFromToken
   );
 
@@ -192,6 +187,7 @@ module.exports = function(app) {
    * Get the subscriptions of a user
    */
   app.get('/transactions/subscriptions', mw.jwtScope('subscriptions'), transactions.getSubscriptions);
+  app.post('/transactions/:transactionid/cancel', NotImplemented); // Cancel a subscription
 
   /**
    * Error handler.

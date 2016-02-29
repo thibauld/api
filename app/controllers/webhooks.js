@@ -27,68 +27,66 @@ module.exports = (app) => {
 
   const transactions = require('./transactions')(app);
 
-  const stripe = (req, res, next) => {
-    const body = req.body;
-    const isProduction = app.set('env') === 'production';
+  const handleCanceledSubscription = (payload, res, next) => {
+    const subscription = payload.event.data.object;
 
-    // Stripe send test events to production as well
-    // don't do anything if the event is not livemode
-    if (isProduction && !body.livemode) {
+    Transaction.update({
+      subscriptionIsActive: false
+    }, {
+      where: {
+        stripeSubscriptionId: subscription.id
+      },
+      returning: true
+    })
+    .spread((count) => {
+      if (count === 0) {
+        return cb(new errors.BadRequest('Transaction not found: unknown subscription id'));
+      }
+
       return res.sendStatus(200);
-    }
+    })
+    .catch(next);
+  };
+
+  const handleInvoicePayment = (payload, res, next) => {
+    const event = payload.event;
+    const isProduction = payload.isProduction;
+    const eventId = payload.eventId;
+    const stripeAccount = payload.stripeAccount;
+
+    const invoice = event.data.object;
+    const invoiceLineItems = invoice.lines.data;
+    const subscription = _.find(invoiceLineItems, { type: 'subscription' });
 
     async.auto({
-      fetchEvent: (cb) => {
-
-        /**
-         * We check the event on stripe to be sure we don't get a fake event from
-         * someone else
-         */
-        app.stripe.events.retrieve(body.id, {
-          stripe_account: body.user_id
-        })
-        .then(event => {
-          if (event.type !== 'invoice.payment_succeeded') {
-            return cb(new errors.BadRequest('Wrong event type received'));
-          }
-
-          const invoice = event.data.object;
-          const invoiceLineItems = invoice.lines.data;
-          const subscription = _.find(invoiceLineItems, { type: 'subscription' });
-
-          cb(null, { event, subscription });
-        })
-        .catch(cb);
-      },
-
-      createActivity: ['fetchEvent', (cb, results) => {
+      createActivity: [(cb) => {
         // Only save activity when the event is valid
         Activity.create({
           type: activities.WEBHOOK_STRIPE_RECEIVED,
           data: {
-            event: results.fetchEvent.event,
-            stripeAccount: body.user_id,
-            eventId: body.id,
-            dashboardUrl: `https://dashboard.stripe.com/${body.user_id}/events/${body.id}`
+            event,
+            stripeAccount,
+            eventId,
+            dashboardUrl: `https://dashboard.stripe.com/${stripeAccount}/events/${eventId}`
           }
         })
         .done(cb);
       }],
 
-      fetchPendingTransaction: ['createActivity', (cb, results) => {
+      fetchPendingTransaction: ['createActivity', (cb) => {
         Transaction.findOne({
           where: {
-            stripeSubscriptionId: results.fetchEvent.subscription.id,
+            stripeSubscriptionId: subscription.id,
             isWaitingFirstInvoice: true
           }
         })
         .done(cb);
       }],
 
-      fetchTransaction: ['createActivity', (cb, results) => {
+      fetchTransaction: ['createActivity', (cb) => {
         Transaction.findOne({
           where: {
-            stripeSubscriptionId: results.fetchEvent.subscription.id
+            stripeSubscriptionId: subscription.id
           },
           include: [
             { model: Group },
@@ -132,10 +130,10 @@ module.exports = (app) => {
               return Activity.create({
                     type: activities.SUBSCRIPTION_CONFIRMED,
                     data: {
-                      event: results.fetchEvent.event,
+                      event,
                       group: results.fetchTransaction.Group,
                       user: results.fetchTransaction.User,
-                      transaction: transaction
+                      transaction
                     }
                   });
             })
@@ -144,7 +142,6 @@ module.exports = (app) => {
         }
 
         const transaction = results.fetchTransaction;
-        const subscription = results.fetchEvent.subscription;
         const user = transaction.User || {};
         const group = transaction.Group || {};
         const card = transaction.Card || {};
@@ -176,7 +173,46 @@ module.exports = (app) => {
        */
       res.sendStatus(200);
     });
+  };
 
+  const stripe = (req, res, next) => {
+    const body = req.body;
+    const isProduction = app.set('env') === 'production'; // keep here for testing purposes
+
+    // Stripe send test events to production as well
+    // don't do anything if the event is not livemode
+    if (isProduction && !body.livemode) {
+      return res.sendStatus(200);
+    }
+
+    /**
+     * We check the event on stripe to be sure we don't get a fake event from
+     * someone else
+     */
+    app.stripe.events.retrieve(body.id, {
+      stripe_account: body.user_id
+    })
+    .then(event => {
+
+      const payload = {
+        stripeAccount: body.user_id,
+        eventId: body.id,
+        event,
+        isProduction
+      };
+
+      switch (event.type) {
+        case 'invoice.payment_succeeded': // subscription payment is successful
+          return handleInvoicePayment(payload, res, next);
+
+        case 'customer.subscription.deleted': // subscription got deleted (canceled)
+          return handleCanceledSubscription(payload, res, next);
+
+        default:
+          return next(new errors.BadRequest('Wrong event type received'));
+      }
+    })
+    .catch(next);
   };
 
   return {

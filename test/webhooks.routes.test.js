@@ -21,23 +21,27 @@ const models = app.set('models');
  * Mock data
  */
 
-var stripeMock = require('./mocks/stripe');
-var userData = utils.data('user1');
-var groupData = utils.data('group1');
+const stripeMock = require('./mocks/stripe');
+const userData = utils.data('user1');
+const groupData = utils.data('group1');
 var stripeEmail;
-var webhookEvent = stripeMock.webhook;
-var webhookInvoice = webhookEvent.data.object;
-var webhookSubscription = webhookInvoice.lines.data[0];
-var customerId = stripeMock.customers.create.id;
 
-var STRIPE_TOKEN = 'superStripeToken';
-var STRIPE_URL = 'https://api.stripe.com:443';
-var CHARGE = 10.99;
-var STRIPE_CHARGE = 1099;
-var STRIPE_SUBSCRIPTION_CHARGE = webhookSubscription.amount;
-var SUBSCRIPTION_CHARGE = webhookSubscription.amount / 100;
-var CURRENCY = 'USD';
-var INTERVAL = 'month';
+const webhookEvent = stripeMock.webhook;
+const webhookInvoice = webhookEvent.data.object;
+const webhookSubscription = webhookInvoice.lines.data[0];
+
+const webhookCancelEvent = stripeMock.webhook_cancel;
+
+const customerId = stripeMock.customers.create.id;
+
+const STRIPE_TOKEN = 'superStripeToken';
+const STRIPE_URL = 'https://api.stripe.com:443';
+const CHARGE = 10.99;
+const STRIPE_CHARGE = 1099;
+const STRIPE_SUBSCRIPTION_CHARGE = webhookSubscription.amount;
+const SUBSCRIPTION_CHARGE = webhookSubscription.amount / 100;
+const CURRENCY = 'USD';
+const INTERVAL = 'month';
 
 var stubStripe = () => {
   var mock = stripeMock.accounts.create;
@@ -276,6 +280,30 @@ describe('webhooks.routes.test.js', () => {
 
         });
     });
+
+    it('cancels the subscription and updates the transactions', done => {
+      nocks['events.retrieve'] = nock(STRIPE_URL)
+        .get('/v1/events/' + webhookCancelEvent.id)
+        .reply(200, webhookCancelEvent);
+
+      request(app)
+        .post('/webhooks/stripe')
+        .send(webhookCancelEvent)
+        .expect(200)
+        .end((err) => {
+          expect(err).to.not.exist;
+          expect(nocks['events.retrieve'].isDone()).to.be.true;
+
+          models.Transaction.findAndCountAll()
+            .then(res => {
+              res.rows.forEach((t) => {
+                expect(t.subscriptionIsActive).to.be.equal(false);
+              })
+              done();
+            });
+        });
+    });
+
   });
 
   it('returns 200 if the event is not livemode in production', (done) => {
@@ -343,9 +371,7 @@ describe('webhooks.routes.test.js', () => {
 
       request(app)
         .post('/webhooks/stripe')
-        .send({
-          id: id
-        })
+        .send({ id })
         .expect(400)
         .end(done);
     });
