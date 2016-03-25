@@ -31,6 +31,7 @@ function setupModels(client) {
   [
     'Activity',
     'Application',
+    'Expense',
     'PaymentMethod',
     'Group',
     'ConnectedAccount',
@@ -74,6 +75,7 @@ function setupModels(client) {
   m.User.hasMany(m.Activity);
 
   m.Activity.belongsTo(m.Transaction);
+  m.Activity.belongsTo(m.Expense);
 
   // Notification.
   m.User.hasMany(m.Notification);
@@ -97,6 +99,11 @@ function setupModels(client) {
   // Subscription
   m.Transaction.belongsTo(m.Subscription);
   m.Subscription.hasMany(m.Transaction);
+
+  // Expense
+  // m.Transaction.belongsTo(m.Expense); // add ExpenseId to Transaction
+  m.Expense.belongsTo(m.User); // add UserId to Expense
+  m.Expense.belongsTo(m.Group);
 
   return m;
 };

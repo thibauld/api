@@ -22,21 +22,22 @@ module.exports = (app) => {
    * Controllers
    */
 
-  const Controllers = app.set('controllers');
-  const mw = Controllers.middlewares;
-  const users = Controllers.users;
-  const groups = Controllers.groups;
-  const activities = Controllers.activities;
-  const notifications = Controllers.notifications;
-  const transactions = Controllers.transactions;
-  const payments = Controllers.payments;
-  const paypal = Controllers.paypal;
-  const images = Controllers.images;
-  const paymentMethods = Controllers.paymentmethods;
-  const webhooks = Controllers.webhooks;
-  const stripe = Controllers.stripe;
-  const test = Controllers.test;
-  const subscriptions = Controllers.subscriptions;
+  const controllers = app.set('controllers');
+  const mw = controllers.middlewares;
+  const users = controllers.users;
+  const groups = controllers.groups;
+  const activities = controllers.activities;
+  const notifications = controllers.notifications;
+  const transactions = controllers.transactions;
+  const payments = controllers.payments;
+  const paypal = controllers.paypal;
+  const images = controllers.images;
+  const paymentMethods = controllers.paymentmethods;
+  const webhooks = controllers.webhooks;
+  const stripe = controllers.stripe;
+  const test = controllers.test;
+  const subscriptions = controllers.subscriptions;
+  const expenses = controllers.expenses;
 
   const HOST = roles.HOST;
   const MEMBER = roles.MEMBER;
@@ -153,6 +154,14 @@ module.exports = (app) => {
   app.post('/groups/:groupid/transactions/:transactionid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessToTransaction(), required('service'), transactions.pay); // Pay a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), transactions.attributeUser); // Attribute a transaction to a user.
   app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', payments.paypalCallback); // Callback after a payment
+
+  /**
+   * Expenses
+   */
+
+  // TODO: add the isPublic logic
+  app.post('/groups/:groupid/expenses', required('expense'), expenses.create); // Create a new expense for a group.
+
 
   /**
    * Activities.
