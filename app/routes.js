@@ -22,22 +22,22 @@ module.exports = (app) => {
    * Controllers
    */
 
-  const controllers = app.set('controllers');
-  const mw = controllers.middlewares;
-  const users = controllers.users;
-  const groups = controllers.groups;
-  const activities = controllers.activities;
-  const notifications = controllers.notifications;
-  const transactions = controllers.transactions;
-  const payments = controllers.payments;
-  const paypal = controllers.paypal;
-  const images = controllers.images;
-  const paymentMethods = controllers.paymentmethods;
-  const webhooks = controllers.webhooks;
-  const stripe = controllers.stripe;
-  const test = controllers.test;
-  const subscriptions = controllers.subscriptions;
-  const expenses = controllers.expenses;
+
+  const Controllers = app.set('controllers');
+  const mw = Controllers.middlewares;
+  const users = Controllers.users;
+  const groups = Controllers.groups;
+  const activities = Controllers.activities;
+  const notifications = Controllers.notifications;
+  const transactions = Controllers.transactions;
+  const donations = Controllers.donations;
+  const paypal = Controllers.paypal;
+  const images = Controllers.images;
+  const paymentMethods = Controllers.paymentmethods;
+  const webhooks = Controllers.webhooks;
+  const stripe = Controllers.stripe;
+  const test = Controllers.test;
+  const subscriptions = Controllers.subscriptions;
 
   const HOST = roles.HOST;
   const MEMBER = roles.MEMBER;
@@ -123,8 +123,12 @@ module.exports = (app) => {
   app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), groups.getUsers); // Get group users
   app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
-  app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
-  app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), required('payment'), payments.paypal); // Make a payment/donation.
+  app.post('/groups/:groupid/donations', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
+  app.post('/groups/:groupid/donations/paypal', aN.authenticateUserOrApp(), required('payment'), donations.paypal); // Make a payment/donation.
+
+  // TODO: Remove after frontend migrates to new calls above
+  app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), required('payment'), donations.paypal); // Make a payment/donation.
 
   /**
    * UserGroup.
@@ -154,7 +158,7 @@ module.exports = (app) => {
   app.post('/groups/:groupid/transactions/:transactionid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('approved'), transactions.approve); // Approve a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessToTransaction(), required('service'), transactions.pay); // Pay a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), transactions.attributeUser); // Attribute a transaction to a user.
-  app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', payments.paypalCallback); // Callback after a payment
+  app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
 
   /**
    * Expenses

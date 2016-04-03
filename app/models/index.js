@@ -31,6 +31,7 @@ function setupModels(client) {
   [
     'Activity',
     'Application',
+    'Donation',
     'Expense',
     'PaymentMethod',
     'Group',
@@ -92,6 +93,14 @@ function setupModels(client) {
   m.Transaction.belongsTo(m.PaymentMethod);
   m.PaymentMethod.hasMany(m.Transaction);
 
+  // Donation.
+  m.Donation.belongsTo(m.User);
+  m.User.hasMany(m.Donation);
+  m.Donation.belongsTo(m.Group);
+  m.Group.hasMany(m.Donation);
+  m.Transaction.belongsTo(m.Donation);
+  m.Donation.hasMany(m.Transaction);
+
   // Application.
   m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});
   m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
@@ -99,6 +108,7 @@ function setupModels(client) {
   // Subscription
   m.Transaction.belongsTo(m.Subscription);
   m.Subscription.hasMany(m.Transaction);
+  m.Donation.belongsTo(m.Subscription);
 
   // Expense
   // m.Transaction.belongsTo(m.Expense); // add ExpenseId to Transaction

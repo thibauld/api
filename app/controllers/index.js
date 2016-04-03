@@ -6,12 +6,12 @@ module.exports = function(app) {
   var cs = {};
   var controllers = [
     'activities',
+    'donations',
     'expenses',
     'paymentmethods',
     'groups',
     'images',
     'middlewares',
-    'payments',
     'paypal',
     'notifications',
     'stripe',

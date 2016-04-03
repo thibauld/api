@@ -1,6 +1,6 @@
 const _ = require('lodash');
-const config = require('config');
 const app = require('../index');
+const config = require('config');
 const models = app.set('models');
 
 const done = (err) => {
@@ -24,7 +24,7 @@ models.StripeAccount.findAll({})
 .map((stripeAccount) => {
 
   stripeAccount.accessToken = secret;
-  stripeAccount.stripePublishableKey = key;
+  stripeAccount.stripePublishableKey = publicKey;
 
   return stripeAccount.save();
 })
