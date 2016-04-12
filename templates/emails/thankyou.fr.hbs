@@ -11,32 +11,35 @@ Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=
 </center>
 
 {{#if user.name}}
-<p>{{user.name}},</p>
+<p>Merci beaucoup {{user.name}} !</p>
 {{else}}
 <p>Hi!</p>
 {{/if}}
 
 {{#if interval}}
-<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
+<p>Nous venons de recevoir votre donation 1ère donation récurrente de {{{currency donation.amountFloat currency=donation.currency}}} par {{interval}}. Merci énormément pour votre engagement à nous aider dans la durée, votre don nous sera précieux pour faire de LaPrimaire.org un succès !</p>
 {{else}}
 <p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}}.
   Votre don nous aidera à continuer nos activités.</p>
 {{/if}}
-
-<p>Vous pouvez suivre nos prochaines activités et comment on va utiliser l'argent recolté sur notre page OpenCollective:
-  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+<p>Pour suivre l'utilisation qui est faite de votre argent, nous tenons des comptes transparents que vous pouvez consulter ici : 
+ <a href="https://laprimaire.org/financer/">https://laprimaire.org/financer/</a>
+ et bientôt ici :
+ <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
 </p>
 
 {{#if subscriptionsLink}}
   <p>
-    Vous pouvez modifier ou annuler vos abonnements quand vous le souhaitez <a href="{{subscriptionsLink}}">ici</a>.
+    Vous pouvez modifier ou annuler votre donation récurrente quand vous le souhaitez <a href="{{subscriptionsLink}}">ici</a>.
   </p>
 {{/if}}
 
-<p>Encore merci et gros bisous de nous tous! 😘,</p>
+<p>Encore merci, votre preuve de confiance nous encourage et nous motive pour ne rien lacher et aller jusqu'au bout !</p>
+<p>Bien amicalement,</p>
+<br/>
 
 <p>
-  – Le collectif {{group.name}}
+  – L'équipe {{group.name}}
 </p>
 
 {{> footer}}
